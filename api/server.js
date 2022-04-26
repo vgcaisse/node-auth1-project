@@ -29,12 +29,12 @@ const server = express();
 server.use(session({
   name: 'chocolatechip',
   secret: 'shhhhh',
-  saveUninitialized: false,
   resave: false,
   
   store: new Store({
     // knex,
     // useNullAsDefault: true,
+    saveUninitialized: false,
     createtable: true,
     clearInterval: 1000 * 60 * 10,
     tablename: 'session',

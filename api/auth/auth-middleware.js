@@ -8,8 +8,11 @@ const User = require('../users/users-model')
   }
 */
 function restricted(req, res, next) {
-  console.log('middleware')
-  next()
+  if (req.session.user) {
+    next()
+  } else {
+    next({ status: 401, message: `You shall not pass!`})
+  }
 }
 
 /*
@@ -23,7 +26,7 @@ function restricted(req, res, next) {
 function checkUsernameFree(req, res, next) {
   User.findBy({ username: req.body.username })
     .then(users => {
-      if(!users.length) {
+      if (!users.length) {
         next()
       } else {
         next({ status: 422, message: `Username taken: ${req.body.username}` })
@@ -45,7 +48,7 @@ function checkUsernameFree(req, res, next) {
 function checkUsernameExists(req, res, next) {
   User.findBy({ username: req.body.username })
     .then(users => {
-      if(users.length) {
+      if (users.length) {
         req.user = users[0]
         next()
       } else {
@@ -66,11 +69,11 @@ function checkUsernameExists(req, res, next) {
   }
 */
 function checkPasswordLength(req, res, next) {
-      if(req.body.password.length < 3 || !req.body.password) {
-        next({ status: 422, message: 'Password must be longer than 3 chars' })
-      } else {
-        next()
-      }
+  if (req.body.password.length < 3 || !req.body.password) {
+    next({ status: 422, message: 'Password must be longer than 3 chars' })
+  } else {
+    next()
+  }
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules

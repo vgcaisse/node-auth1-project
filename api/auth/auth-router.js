@@ -41,7 +41,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res, next
 
   User.add({ username, password: hash })
     .then(savedUser => {
-      res.status(200).json({ message: `welcome ${savedUser.username}!` })
+      res.status(200).json(savedUser)
     })
     .catch(err => {
       next(err)
@@ -93,7 +93,17 @@ router.post('/login', checkUsernameExists, (req, res, next) => {
  */
 
 router.get('/logout', (req, res, next) => {
-  res.json('logout')
+  if (req.session.user) {
+    req.session.destroy(err => {
+      if (err) {
+        next(err)
+      } else {
+        res.json({ message: `logged out` })
+      }
+    })
+  } else {
+    res.json({ message: `no session` })
+  }
 })
 
 // Don't forget to add the router to the `exports` object so it can be required in other modules
