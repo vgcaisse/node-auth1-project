@@ -26,7 +26,7 @@ function checkUsernameFree(req, res, next) {
       if(!users.length) {
         next()
       } else {
-        next({ message: 'Username taken' })
+        next({ status: 422, message: `Username taken: ${req.body.username}` })
       }
     })
     .catch(err => {
@@ -43,7 +43,17 @@ function checkUsernameFree(req, res, next) {
   }
 */
 function checkUsernameExists(req, res, next) {
-  next()
+  User.findBy({ username: req.body.username })
+    .then(users => {
+      if(users.length) {
+        next()
+      } else {
+        next({ status: 401, message: 'Invalid credentials' })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
 }
 
 /*
