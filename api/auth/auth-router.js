@@ -41,7 +41,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res, next
 
   User.add({ username, password: hash })
     .then(savedUser => {
-      res.status(200).json(savedUser)
+      res.status(200).json({ message: `welcome ${savedUser.username}!` })
     })
     .catch(err => {
       next(err)
@@ -65,7 +65,15 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res, next
  */
 
 router.post('/login', checkUsernameExists, (req, res, next) => {
-  res.json('login')
+  const { password } = req.body
+  if (bcrypt.compareSync(password, req.user.password)) {
+    // set the cookie on the client
+    // store the session id to the server
+    req.session.user = req.user
+    res.status(200).json({ message: `Welcome ${req.user.username}` })
+  } else {
+    next({ status: 401, message: 'Invalid credentials'})
+  }
 })
 
 /**
